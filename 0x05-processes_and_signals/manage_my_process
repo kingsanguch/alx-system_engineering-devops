@@ -1,0 +1,40 @@
+#!/bin/bash
+
+case "$1" in
+    start)
+        echo "Starting manage_my_process..."
+        # Start the process in the background
+        /bin/bash /tmp/manage_my_process.sh &
+        # Capture the PID of the background process
+        echo $! > /var/run/my_process.pid
+        echo "manage_my_process started"
+        ;;
+    stop)
+        echo "Stopping manage_my_process..."
+        # Check if the PID file exists
+        if [ -f /var/run/my_process.pid ]; then
+            # Read the PID from the PID file
+            PID=$(cat /var/run/my_process.pid)
+            # Kill the process using the PID
+            kill $PID
+            # Remove the PID file
+            rm /var/run/my_process.pid
+            echo "manage_my_process stopped"
+        else
+            echo "No running manage_my_process found."
+        fi
+        ;;
+    restart)
+        echo "Restarting manage_my_process..."
+        # Stop the process
+        $0 stop
+        # Start the process
+        $0 start
+        echo "manage_my_process restarted"
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit 0
